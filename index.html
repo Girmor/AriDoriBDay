@@ -687,66 +687,68 @@
           {/* Модалка */}
           {showModal && selectedCard && (
             <div onClick={() => setShowModal(false)} style={{
-              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              zIndex: 1000, animation: 'fadeIn 0.3s ease', padding: '20px'
+              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+              zIndex: 1000, animation: 'fadeIn 0.3s ease', 
+              padding: '10px', overflowY: 'auto'
             }}>
               <div onClick={e => e.stopPropagation()} style={{
                 background: 'linear-gradient(145deg, #1a1a3a, #0a0a1a)',
-                borderRadius: '30px', padding: '40px', maxWidth: '500px', width: '100%',
+                borderRadius: '20px', padding: '25px 20px', maxWidth: '400px', width: '100%',
                 border: `2px solid ${RARITY_CONFIG[selectedCard.rarity].glow}`,
-                boxShadow: `0 0 60px ${RARITY_CONFIG[selectedCard.rarity].glow}40`,
-                animation: 'modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                boxShadow: `0 0 40px ${RARITY_CONFIG[selectedCard.rarity].glow}40`,
+                animation: 'modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                margin: '20px auto'
               }}>
-                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                   <div style={{
-                    display: 'inline-block', padding: '8px 20px', borderRadius: '20px',
+                    display: 'inline-block', padding: '6px 16px', borderRadius: '20px',
                     background: RARITY_CONFIG[selectedCard.rarity].gradient,
-                    fontSize: '12px', fontWeight: '700', textTransform: 'uppercase',
-                    letterSpacing: '2px', marginBottom: '20px'
+                    fontSize: '11px', fontWeight: '700', textTransform: 'uppercase',
+                    letterSpacing: '2px', marginBottom: '15px'
                   }}>{RARITY_CONFIG[selectedCard.rarity].label}</div>
                   
                   <div style={{
-                    fontSize: '100px', marginBottom: '20px',
-                    filter: `drop-shadow(0 0 40px ${RARITY_CONFIG[selectedCard.rarity].glow})`
+                    marginBottom: '15px',
+                    filter: `drop-shadow(0 0 30px ${RARITY_CONFIG[selectedCard.rarity].glow})`
                   }}>
                     {selectedCard.image ? (
                       <img src={selectedCard.image} alt={selectedCard.name}
-                        style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain' }} />
-                    ) : '🔋'}
+                        style={{ maxWidth: '150px', maxHeight: '150px', objectFit: 'contain' }} />
+                    ) : <span style={{ fontSize: '80px' }}>🔋</span>}
                   </div>
                   
                   <h3 style={{
-                    fontSize: '28px', fontWeight: '800', margin: '0 0 10px',
+                    fontSize: '22px', fontWeight: '800', margin: '0 0 5px',
                     color: RARITY_CONFIG[selectedCard.rarity].glow
                   }}>{selectedCard.name}</h3>
                   
-                  <div style={{ fontSize: '48px', fontWeight: '900', color: '#fff', opacity: 0.3 }}>
+                  <div style={{ fontSize: '36px', fontWeight: '900', color: '#fff', opacity: 0.3 }}>
                     {selectedCard.year}
                   </div>
                 </div>
                 
-                <p style={{ fontSize: '16px', color: '#ccc', lineHeight: '1.8', textAlign: 'center', marginBottom: '25px' }}>
+                <p style={{ fontSize: '14px', color: '#ccc', lineHeight: '1.6', textAlign: 'center', marginBottom: '20px' }}>
                   {selectedCard.description}
                 </p>
                 
                 <div style={{
-                  background: 'rgba(255,255,255,0.05)', borderRadius: '15px',
-                  padding: '20px', marginBottom: '25px'
+                  background: 'rgba(255,255,255,0.05)', borderRadius: '12px',
+                  padding: '15px', marginBottom: '20px'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#888', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '11px', color: '#888', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>
                     💡 Цікавий факт
                   </div>
-                  <div style={{ fontSize: '14px', color: '#aaa', lineHeight: '1.6' }}>
+                  <div style={{ fontSize: '13px', color: '#aaa', lineHeight: '1.5' }}>
                     {selectedCard.funFact}
                   </div>
                 </div>
                 
                 <button onClick={() => setShowModal(false)} style={{
-                  width: '100%', padding: '15px', borderRadius: '15px', border: 'none',
+                  width: '100%', padding: '14px', borderRadius: '12px', border: 'none',
                   background: RARITY_CONFIG[selectedCard.rarity].gradient,
                   color: '#fff', fontSize: '16px', fontWeight: '700', cursor: 'pointer',
-                  boxShadow: `0 10px 30px ${RARITY_CONFIG[selectedCard.rarity].glow}40`
+                  boxShadow: `0 8px 25px ${RARITY_CONFIG[selectedCard.rarity].glow}40`
                 }}>
                   OK
                 </button>
