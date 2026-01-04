@@ -633,45 +633,39 @@
           {(() => {
             const simulatedYear = getSimulatedYear();
             
-            // Визначаємо який максимальний рік показувати
-            // Базово показуємо до поточного року
-            let maxYearToShow = simulatedYear;
+            // Знаходимо максимальний відкритий рік
+            let maxUnlockedYear = 0;
             
-            // Якщо останній павербанк в POWERBANKS вже відкритий - показуємо +1 рік
-            const lastPowerbank = POWERBANKS[POWERBANKS.length - 1];
-            const lastPowerbankIndex = POWERBANKS.length - 1;
-            if (lastPowerbank.unlocked || revealedCards[lastPowerbankIndex]) {
-              maxYearToShow = lastPowerbank.year + 1;
-            }
+            // Перевіряємо POWERBANKS
+            POWERBANKS.forEach((pb, idx) => {
+              if (pb.unlocked || revealedCards[idx]) {
+                maxUnlockedYear = Math.max(maxUnlockedYear, pb.year);
+              }
+            });
             
-            // Додаємо майбутні павербанки до maxYearToShow
+            // Перевіряємо FUTURE_POWERBANKS (індекси починаються після POWERBANKS)
+            FUTURE_POWERBANKS.forEach((pb, idx) => {
+              const globalIndex = POWERBANKS.length + idx;
+              if (revealedCards[globalIndex]) {
+                maxUnlockedYear = Math.max(maxUnlockedYear, pb.year);
+              }
+            });
+            
+            // Показуємо картки до maxUnlockedYear + 1 (наступна закрита)
+            const maxYearToShow = maxUnlockedYear > 0 ? maxUnlockedYear + 1 : simulatedYear;
+            
+            // Додаємо майбутні павербанки
             const futureToCurrent = FUTURE_POWERBANKS
               .filter(pb => pb.year <= maxYearToShow)
-              .map((pb, idx) => {
-                // Перевіряємо чи попередній рік відкритий
-                const prevYear = pb.year - 1;
-                const prevInPowerbanks = POWERBANKS.find(p => p.year === prevYear);
-                const prevInFuture = FUTURE_POWERBANKS.find(p => p.year === prevYear);
-                const prevIndex = prevInPowerbanks 
-                  ? POWERBANKS.indexOf(prevInPowerbanks)
-                  : POWERBANKS.length + FUTURE_POWERBANKS.indexOf(prevInFuture);
-                const isPrevUnlocked = prevInPowerbanks 
-                  ? (prevInPowerbanks.unlocked || revealedCards[prevIndex])
-                  : revealedCards[prevIndex];
-                
-                return {
-                  year: pb.year,
-                  name: pb.name,
-                  rarity: pb.rarity,
-                  description: pb.teaser,
-                  funFact: "Цікавий факт з'явиться пізніше!",
-                  image: `./images/powerbank-${pb.year}.png`,
-                  unlocked: false,
-                  // Показуємо тільки якщо попередній відкритий
-                  shouldShow: isPrevUnlocked
-                };
-              })
-              .filter(pb => pb.shouldShow);
+              .map((pb, idx) => ({
+                year: pb.year,
+                name: pb.name,
+                rarity: pb.rarity,
+                description: pb.teaser,
+                funFact: "Цікавий факт з'явиться пізніше!",
+                image: `./images/powerbank-${pb.year}.png`,
+                unlocked: false
+              }));
             
             const allCards = [...POWERBANKS, ...futureToCurrent];
             
@@ -709,14 +703,25 @@
 
           {/* Майбутні */}
           {(() => {
-            // Визначаємо з якого року показувати Coming Soon
-            const lastPowerbank = POWERBANKS[POWERBANKS.length - 1];
-            const lastPowerbankIndex = POWERBANKS.length - 1;
-            const isLastUnlocked = lastPowerbank.unlocked || revealedCards[lastPowerbankIndex];
+            // Знаходимо максимальний відкритий рік
+            let maxUnlockedYear = 0;
             
-            // Якщо останній відкритий - Coming Soon починається з +2 року (бо +1 вже в картках)
-            // Якщо ні - з +1 року
-            const startYear = isLastUnlocked ? lastPowerbank.year + 2 : lastPowerbank.year + 1;
+            POWERBANKS.forEach((pb, idx) => {
+              if (pb.unlocked || revealedCards[idx]) {
+                maxUnlockedYear = Math.max(maxUnlockedYear, pb.year);
+              }
+            });
+            
+            FUTURE_POWERBANKS.forEach((pb, idx) => {
+              const globalIndex = POWERBANKS.length + idx;
+              if (revealedCards[globalIndex]) {
+                maxUnlockedYear = Math.max(maxUnlockedYear, pb.year);
+              }
+            });
+            
+            // Coming Soon починається з maxUnlockedYear + 2 
+            // (бо +1 вже показується в картках як закрита)
+            const startYear = maxUnlockedYear > 0 ? maxUnlockedYear + 2 : POWERBANKS[POWERBANKS.length - 1].year + 1;
             
             return (
               <div style={{ padding: '40px 20px 80px', maxWidth: '1200px', margin: '0 auto' }}>
