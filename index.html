@@ -38,7 +38,7 @@
     const POWERBANKS = [
       {
         year: 2025,
-        name: "Перший",
+        name: "Перший Іскр",
         rarity: "legendary",
         description: "Той самий перший. Початок традиції!",
         funFact: "Павербанк середньої ємності може зарядити смартфон 3-4 рази",
@@ -632,17 +632,47 @@
           {/* Картки */}
           {(() => {
             const simulatedYear = getSimulatedYear();
+            
+            // Визначаємо який максимальний рік показувати
+            // Базово показуємо до поточного року
+            let maxYearToShow = simulatedYear;
+            
+            // Якщо останній павербанк в POWERBANKS вже відкритий - показуємо +1 рік
+            const lastPowerbank = POWERBANKS[POWERBANKS.length - 1];
+            const lastPowerbankIndex = POWERBANKS.length - 1;
+            if (lastPowerbank.unlocked || revealedCards[lastPowerbankIndex]) {
+              maxYearToShow = lastPowerbank.year + 1;
+            }
+            
+            // Додаємо майбутні павербанки до maxYearToShow
             const futureToCurrent = FUTURE_POWERBANKS
-              .filter(pb => pb.year <= simulatedYear)
-              .map(pb => ({
-                year: pb.year,
-                name: pb.name,
-                rarity: pb.rarity,
-                description: pb.teaser,
-                funFact: "Цікавий факт з'явиться пізніше!",
-                image: `./images/powerbank-${pb.year}.png`,
-                unlocked: false
-              }));
+              .filter(pb => pb.year <= maxYearToShow)
+              .map((pb, idx) => {
+                // Перевіряємо чи попередній рік відкритий
+                const prevYear = pb.year - 1;
+                const prevInPowerbanks = POWERBANKS.find(p => p.year === prevYear);
+                const prevInFuture = FUTURE_POWERBANKS.find(p => p.year === prevYear);
+                const prevIndex = prevInPowerbanks 
+                  ? POWERBANKS.indexOf(prevInPowerbanks)
+                  : POWERBANKS.length + FUTURE_POWERBANKS.indexOf(prevInFuture);
+                const isPrevUnlocked = prevInPowerbanks 
+                  ? (prevInPowerbanks.unlocked || revealedCards[prevIndex])
+                  : revealedCards[prevIndex];
+                
+                return {
+                  year: pb.year,
+                  name: pb.name,
+                  rarity: pb.rarity,
+                  description: pb.teaser,
+                  funFact: "Цікавий факт з'явиться пізніше!",
+                  image: `./images/powerbank-${pb.year}.png`,
+                  unlocked: false,
+                  // Показуємо тільки якщо попередній відкритий
+                  shouldShow: isPrevUnlocked
+                };
+              })
+              .filter(pb => pb.shouldShow);
+            
             const allCards = [...POWERBANKS, ...futureToCurrent];
             
             return (
@@ -667,22 +697,35 @@
           })()}
 
           {/* Майбутні */}
-          <div style={{ padding: '40px 20px 80px', maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-              <div style={{ 
-                fontSize: '14px', textTransform: 'uppercase', 
-                letterSpacing: '6px', color: '#444'
-              }}>
-                Coming Soon
+          {(() => {
+            // Визначаємо з якого року показувати Coming Soon
+            const lastPowerbank = POWERBANKS[POWERBANKS.length - 1];
+            const lastPowerbankIndex = POWERBANKS.length - 1;
+            const isLastUnlocked = lastPowerbank.unlocked || revealedCards[lastPowerbankIndex];
+            
+            // Якщо останній відкритий - Coming Soon починається з +2 року (бо +1 вже в картках)
+            // Якщо ні - з +1 року
+            const startYear = isLastUnlocked ? lastPowerbank.year + 2 : lastPowerbank.year + 1;
+            
+            return (
+              <div style={{ padding: '40px 20px 80px', maxWidth: '1200px', margin: '0 auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                  <div style={{ 
+                    fontSize: '14px', textTransform: 'uppercase', 
+                    letterSpacing: '6px', color: '#444'
+                  }}>
+                    Coming Soon
+                  </div>
+                </div>
+                <div style={{
+                  display: 'flex', justifyContent: 'flex-start', gap: '20px',
+                  overflowX: 'auto', padding: '10px'
+                }}>
+                  {FUTURE_POWERBANKS.filter(pb => pb.year >= startYear).map((pb) => <FutureCard key={pb.year} powerbank={pb} />)}
+                </div>
               </div>
-            </div>
-            <div style={{
-              display: 'flex', justifyContent: 'flex-start', gap: '20px',
-              overflowX: 'auto', padding: '10px'
-            }}>
-              {FUTURE_POWERBANKS.filter(pb => pb.year > getSimulatedYear()).map((pb) => <FutureCard key={pb.year} powerbank={pb} />)}
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Модалка */}
           {showModal && selectedCard && (
