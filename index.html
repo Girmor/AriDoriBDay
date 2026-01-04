@@ -38,7 +38,7 @@
     const POWERBANKS = [
       {
         year: 2025,
-        name: "Перший Іскр",
+        name: "Перший",
         rarity: "legendary",
         description: "Той самий перший. Початок традиції!",
         funFact: "Павербанк середньої ємності може зарядити смартфон 3-4 рази",
@@ -420,10 +420,9 @@
 
       const handlePinSubmit = () => {
         if (pinInput === SECRET_PIN) {
-          setIsAuthenticated(true);
           localStorage.setItem('powerbank-auth', 'true');
-          setShowPinModal(false);
-          setPinError(false);
+          // Перезавантажуємо сторінку щоб оновити стан
+          window.location.reload();
         } else {
           setPinError(true);
           setPinInput('');
