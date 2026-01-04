@@ -56,11 +56,40 @@
       }
     ];
 
-    const FUTURE_POWERBANKS = [
-      { year: 2027, name: "Темна Енергія", rarity: "epic", teaser: "Щось потужне наближається..." },
-      { year: 2028, name: "Квантовий Заряд", rarity: "mythic", teaser: "За межами розуміння" },
-      { year: 2029, name: "Нескінченність", rarity: "legendary", teaser: "П'ять років традиції" }
+    // Генеруємо майбутні павербанки до 2100
+    const FUTURE_NAMES = [
+      "Темна Енергія", "Квантовий Заряд", "Нескінченність", "Плазмовий Вибух", "Нейронний Імпульс",
+      "Космічний Потік", "Гравітон", "Антиматерія", "Сонячний Вітер", "Зоряна Пил",
+      "Чорна Діра", "Біла Зірка", "Нова Ера", "Титановий Щит", "Кібер Ядро",
+      "Нано Частка", "Мега Ватт", "Гіпер Заряд", "Ультра Сила", "Омега Потік",
+      "Альфа Хвиля", "Бета Розряд", "Гамма Сплеск", "Дельта Імпульс", "Тета Поле",
+      "Іон Буря", "Протон Вихор", "Нейтрон Ядро", "Електрон Каскад", "Фотон Промінь",
+      "Лазер Блиск", "Голограма", "Телепорт", "Варп Двигун", "Гіперпростір",
+      "Паралель", "Мультиверс", "Сингулярність", "Горизонт Подій", "Темна Матерія",
+      "Світлова Швидкість", "Часовий Зсув", "Просторовий Розрив", "Вічний Двигун", "Абсолют",
+      "Генезис", "Апокаліпсис", "Ренесанс", "Еволюція", "Революція",
+      "Трансформер", "Морфер", "Синтез", "Каталізатор", "Реактор",
+      "Термояд", "Холодний Синтез", "Вакуумна Енергія", "Нуль Точка", "Ефір",
+      "Астрал", "Портал", "Nexus", "Matrix", "Infinity",
+      "Phoenix", "Dragon", "Titan", "Colossus", "Leviathan",
+      "Kraken", "Hydra", "Chimera", "Griffin", "Ultima"
     ];
+    const RARITIES = ["common", "rare", "epic", "legendary", "mythic"];
+    const TEASERS = [
+      "Щось потужне наближається...", "За межами розуміння", "Нова глава історії",
+      "Таємниця чекає", "Легенда в процесі", "Майбутнє невідоме", "To be continued..."
+    ];
+    
+    const FUTURE_POWERBANKS = [];
+    for (let year = 2027; year <= 2100; year++) {
+      const idx = year - 2027;
+      FUTURE_POWERBANKS.push({
+        year: year,
+        name: FUTURE_NAMES[idx % FUTURE_NAMES.length],
+        rarity: RARITIES[idx % RARITIES.length],
+        teaser: TEASERS[idx % TEASERS.length]
+      });
+    }
 
     // Дата народження - 7 січня о 12:00
     const BIRTHDAY_MONTH = 1;
@@ -150,65 +179,22 @@
       return FUN_FACTS[dayOfYear % FUN_FACTS.length];
     };
 
-    // Компонент статистики
+    // Компонент статистики - мінімалістичний
     const CollectionStats = ({ powerbanks, revealedCards }) => {
       const unlockedCount = powerbanks.filter((p, i) => p.unlocked || revealedCards[i]).length;
-      const totalCount = powerbanks.length + FUTURE_POWERBANKS.length;
-      
-      const rarityCount = {};
-      powerbanks.forEach((p, i) => {
-        if (p.unlocked || revealedCards[i]) {
-          rarityCount[p.rarity] = (rarityCount[p.rarity] || 0) + 1;
-        }
-      });
 
       return (
         <div style={{
-          background: 'linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))',
-          borderRadius: '20px', padding: '25px 30px',
-          border: '1px solid rgba(255,255,255,0.1)',
-          maxWidth: '400px', margin: '0 auto 40px'
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: '10px', margin: '0 auto 30px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <div style={{
-              width: '50px', height: '50px', borderRadius: '12px',
-              background: 'linear-gradient(135deg, #FFD700, #FF6F00)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'
-            }}>🔋</div>
-            <div>
-              <div style={{ fontSize: '14px', color: '#888', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                Твоя колекція
-              </div>
-              <div style={{ fontSize: '28px', fontWeight: '800', color: '#fff' }}>
-                {unlockedCount} / {totalCount}
-              </div>
-            </div>
-          </div>
-          
-          <div style={{
-            height: '8px', background: 'rgba(255,255,255,0.1)',
-            borderRadius: '4px', overflow: 'hidden', marginBottom: '20px'
+          <span style={{ fontSize: '20px' }}>🔋</span>
+          <span style={{ 
+            fontSize: '18px', fontWeight: '700', color: '#888',
+            letterSpacing: '2px'
           }}>
-            <div style={{
-              height: '100%', width: `${(unlockedCount / totalCount) * 100}%`,
-              background: 'linear-gradient(90deg, #FFD700, #FF6F00)',
-              borderRadius: '4px', transition: 'width 0.5s ease'
-            }} />
-          </div>
-          
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {Object.entries(RARITY_CONFIG).map(([key, config]) => (
-              <div key={key} style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '6px 12px', borderRadius: '20px',
-                background: rarityCount[key] ? config.gradient : 'rgba(255,255,255,0.05)',
-                opacity: rarityCount[key] ? 1 : 0.4, fontSize: '12px', fontWeight: '600'
-              }}>
-                <span>{rarityCount[key] || 0}</span>
-                <span style={{ opacity: 0.8 }}>{config.label}</span>
-              </div>
-            ))}
-          </div>
+            {unlockedCount} / ∞
+          </span>
         </div>
       );
     };
@@ -420,7 +406,10 @@
         const isBirthdayToday = now.getMonth() === (BIRTHDAY_MONTH - 1) && now.getDate() === BIRTHDAY_DAY;
         const isAfterNoon = now.getHours() >= UNLOCK_HOUR;
         
-        setCanUnlock(isBirthdayToday && isAfterNoon);
+        // Тестовий режим: додай ?test=true до URL щоб відкрити подарунок
+        const isTestMode = new URLSearchParams(window.location.search).get('test') === 'true';
+        
+        setCanUnlock((isBirthdayToday && isAfterNoon) || isTestMode);
         
         if (diff <= 0) return { months: 0, weeks: 0, days: 0, hours: 0, minutes: 0, seconds: 0, totalDays: 0 };
         
@@ -462,8 +451,6 @@
         }, 2000);
       };
 
-      const currentYear = new Date().getFullYear();
-
       return (
         <div style={{
           minHeight: '100vh',
@@ -494,13 +481,10 @@
               letterSpacing: '-2px'
             }}>Power Collection</h1>
             <p style={{ fontSize: '18px', color: '#aaa', marginTop: '15px' }}>
-              🔋 Щорічна традиція енергії ⚡
             </p>
           </header>
 
-          <CollectionStats powerbanks={POWERBANKS} revealedCards={revealedCards} />
-
-          {/* Таймер */}
+                    {/* Таймер */}
           {!canUnlock && (
             <div style={{
               maxWidth: '800px', margin: '0 auto 50px', padding: '30px',
@@ -576,6 +560,7 @@
           )}
 
           {/* Картки */}
+          <CollectionStats powerbanks={POWERBANKS} revealedCards={revealedCards} />
           <div style={{
             display: 'flex', justifyContent: 'center', gap: '40px',
             flexWrap: 'wrap', padding: '20px 40px 60px', maxWidth: '1400px', margin: '0 auto'
@@ -586,7 +571,7 @@
                 powerbank={{ ...powerbank, unlocked: powerbank.unlocked || revealedCards[index] }}
                 onClick={() => handleCardClick(index, powerbank)}
                 isRevealing={revealingCard === index}
-                canUnlock={canUnlock && powerbank.year === currentYear}
+                canUnlock={canUnlock && !powerbank.unlocked && !revealedCards[index]}
               />
             ))}
           </div>
@@ -594,18 +579,18 @@
           {/* Майбутні */}
           <div style={{ padding: '40px 20px 80px', maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-              <div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '4px', color: '#555', marginBottom: '8px' }}>
+              <div style={{ 
+                fontSize: '14px', textTransform: 'uppercase', 
+                letterSpacing: '6px', color: '#444'
+              }}>
                 Coming Soon
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#666', margin: 0 }}>
-                Майбутні поповнення 🔮
-              </h3>
             </div>
             <div style={{
-              display: 'flex', justifyContent: 'center', gap: '20px',
+              display: 'flex', justifyContent: 'flex-start', gap: '20px',
               overflowX: 'auto', padding: '10px'
             }}>
-              {FUTURE_POWERBANKS.map((pb) => <FutureCard key={pb.year} powerbank={pb} />)}
+              {FUTURE_POWERBANKS.filter(pb => pb.year > new Date().getFullYear()).map((pb) => <FutureCard key={pb.year} powerbank={pb} />)}
             </div>
           </div>
 
@@ -673,7 +658,7 @@
                   color: '#fff', fontSize: '16px', fontWeight: '700', cursor: 'pointer',
                   boxShadow: `0 10px 30px ${RARITY_CONFIG[selectedCard.rarity].glow}40`
                 }}>
-                  Круто! ⚡
+                  OK
                 </button>
               </div>
             </div>
