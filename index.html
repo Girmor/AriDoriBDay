@@ -682,15 +682,26 @@
                   display: 'flex', justifyContent: 'center', gap: '40px',
                   flexWrap: 'wrap', padding: '20px 40px 60px', maxWidth: '1400px', margin: '0 auto'
                 }}>
-                  {allCards.map((powerbank, index) => (
-                    <PowerbankCard
-                      key={powerbank.year}
-                      powerbank={{ ...powerbank, unlocked: powerbank.unlocked || revealedCards[index] }}
-                      onClick={() => handleCardClick(index, powerbank)}
-                      isRevealing={revealingCard === index}
-                      canUnlock={canUnlock && !powerbank.unlocked && !revealedCards[index]}
-                    />
-                  ))}
+                  {allCards.map((powerbank, index) => {
+                    // Картку можна відкрити тільки якщо:
+                    // 1. canUnlock = true (день народження + авторизація)
+                    // 2. Рік картки <= поточний симульований рік
+                    // 3. Картка ще не відкрита
+                    const canUnlockThisCard = canUnlock && 
+                      powerbank.year <= simulatedYear && 
+                      !powerbank.unlocked && 
+                      !revealedCards[index];
+                    
+                    return (
+                      <PowerbankCard
+                        key={powerbank.year}
+                        powerbank={{ ...powerbank, unlocked: powerbank.unlocked || revealedCards[index] }}
+                        onClick={() => handleCardClick(index, powerbank)}
+                        isRevealing={revealingCard === index}
+                        canUnlock={canUnlockThisCard}
+                      />
+                    );
+                  })}
                 </div>
               </>
             );
