@@ -173,6 +173,12 @@
       }
     };
 
+    const getSimulatedYear = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const testYear = urlParams.get('year');
+      return testYear ? parseInt(testYear) : new Date().getFullYear();
+    };
+
     const getFactForDate = () => {
       const now = new Date();
       const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
@@ -407,7 +413,10 @@
         const isAfterNoon = now.getHours() >= UNLOCK_HOUR;
         
         // Тестовий режим: додай ?test=true до URL щоб відкрити подарунок
-        const isTestMode = new URLSearchParams(window.location.search).get('test') === 'true';
+        // Симуляція року: додай ?year=2027 щоб побачити як буде виглядати в 2027
+        const urlParams = new URLSearchParams(window.location.search);
+        const isTestMode = urlParams.get('test') === 'true';
+        const testYear = urlParams.get('year');
         
         setCanUnlock((isBirthdayToday && isAfterNoon) || isTestMode);
         
@@ -560,21 +569,41 @@
           )}
 
           {/* Картки */}
-          <CollectionStats powerbanks={POWERBANKS} revealedCards={revealedCards} />
-          <div style={{
-            display: 'flex', justifyContent: 'center', gap: '40px',
-            flexWrap: 'wrap', padding: '20px 40px 60px', maxWidth: '1400px', margin: '0 auto'
-          }}>
-            {POWERBANKS.map((powerbank, index) => (
-              <PowerbankCard
-                key={powerbank.year}
-                powerbank={{ ...powerbank, unlocked: powerbank.unlocked || revealedCards[index] }}
-                onClick={() => handleCardClick(index, powerbank)}
-                isRevealing={revealingCard === index}
-                canUnlock={canUnlock && !powerbank.unlocked && !revealedCards[index]}
-              />
-            ))}
-          </div>
+          {(() => {
+            const simulatedYear = getSimulatedYear();
+            const futureToCurrent = FUTURE_POWERBANKS
+              .filter(pb => pb.year <= simulatedYear)
+              .map(pb => ({
+                year: pb.year,
+                name: pb.name,
+                rarity: pb.rarity,
+                description: pb.teaser,
+                funFact: "Цікавий факт з'явиться пізніше!",
+                image: `./images/powerbank-${pb.year}.png`,
+                unlocked: false
+              }));
+            const allCards = [...POWERBANKS, ...futureToCurrent];
+            
+            return (
+              <>
+                <CollectionStats powerbanks={allCards} revealedCards={revealedCards} />
+                <div style={{
+                  display: 'flex', justifyContent: 'center', gap: '40px',
+                  flexWrap: 'wrap', padding: '20px 40px 60px', maxWidth: '1400px', margin: '0 auto'
+                }}>
+                  {allCards.map((powerbank, index) => (
+                    <PowerbankCard
+                      key={powerbank.year}
+                      powerbank={{ ...powerbank, unlocked: powerbank.unlocked || revealedCards[index] }}
+                      onClick={() => handleCardClick(index, powerbank)}
+                      isRevealing={revealingCard === index}
+                      canUnlock={canUnlock && !powerbank.unlocked && !revealedCards[index]}
+                    />
+                  ))}
+                </div>
+              </>
+            );
+          })()}
 
           {/* Майбутні */}
           <div style={{ padding: '40px 20px 80px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -590,7 +619,7 @@
               display: 'flex', justifyContent: 'flex-start', gap: '20px',
               overflowX: 'auto', padding: '10px'
             }}>
-              {FUTURE_POWERBANKS.filter(pb => pb.year > new Date().getFullYear()).map((pb) => <FutureCard key={pb.year} powerbank={pb} />)}
+              {FUTURE_POWERBANKS.filter(pb => pb.year > getSimulatedYear()).map((pb) => <FutureCard key={pb.year} powerbank={pb} />)}
             </div>
           </div>
 
